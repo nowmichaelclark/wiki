@@ -1,0 +1,13 @@
+{
+  "site_name": "Workshop Wiki",
+  "site_url": "https://nowmichaelclark.github.io/wiki/",
+  "base_path": "/wiki/",
+  "repo": "nowmichaelclark/wiki",
+  "branch": "main",
+  "editor_url": "http://localhost:8080/",
+  "voice": "af_heart",
+  "paradee_version": "1.2",
+  "audio_bitrate": "32k",
+  "audio_shards": "0123456789abcdef",
+  "skip_files": ["CLAUDE.md", "README.md"]
+}

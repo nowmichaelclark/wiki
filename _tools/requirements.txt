@@ -1,0 +1,3 @@
+otterwiki==2.26.2
+soundfile==0.13.1
+paradee @ git+https://github.com/sahilmahendrakar/paradee@aae3cc46657bc69c6dbf9573bba556fb233f6bc0

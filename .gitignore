@@ -1,0 +1,4 @@
+_site/
+audio.json
+__pycache__/
+.env

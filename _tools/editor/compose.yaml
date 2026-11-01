@@ -1,0 +1,59 @@
+# Otterwiki on Mikey's laptop, editing the wiki repo on GitHub.
+# Setup steps: the wiki page "Wiki/Otterwiki editor". Put GITHUB_TOKEN=... in a
+# .env file next to this one, then: podman compose up -d
+# Open http://localhost:8080 (only this computer can reach it).
+services:
+  otterwiki:
+    image: docker.io/redimp/otterwiki:2
+    restart: always
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - wiki-data:/app-data
+    environment:
+      SITE_NAME: Workshop Wiki
+      RETAIN_PAGE_NAME_CASE: "true"
+      READ_ACCESS: ANONYMOUS
+      WRITE_ACCESS: REGISTERED
+      ATTACHMENT_ACCESS: REGISTERED
+      COMMIT_MESSAGE: OPTIONAL
+      GIT_REMOTE_PUSH_ENABLED: "true"
+      GIT_REMOTE_PUSH_URL: "https://x-access-token:${GITHUB_TOKEN}@github.com/nowmichaelclark/wiki.git"
+      WIKI_REMOTE: "https://x-access-token:${GITHUB_TOKEN}@github.com/nowmichaelclark/wiki.git"
+    # Before Otterwiki starts: clone the wiki the first time, pull it every
+    # time after, and keep pulling once a minute so Claude's pushes show up.
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        R=/app-data/repository
+        git config --system --add safe.directory '*'
+        git config --system user.name "Otterwiki sync"
+        git config --system user.email "otterwiki-sync@localhost"
+        if [ ! -d "$$R/.git" ]; then
+          rm -rf "$$R"
+          git clone -q "$$WIKI_REMOTE" "$$R"
+        else
+          git -C "$$R" remote set-url origin "$$WIKI_REMOTE"
+        fi
+        chown -R 33:33 /app-data
+        cat > /usr/local/bin/wiki-sync <<'SYNC'
+        #!/bin/sh
+        cd /app-data/repository || exit 0
+        if ! git pull -q --rebase --autostash origin main; then
+          git rebase --abort 2>/dev/null
+          echo "wiki-sync: pull failed; an edit here clashes with one on GitHub" >&2
+          exit 0
+        fi
+        git push -q origin HEAD:main 2>/dev/null || true
+        SYNC
+        chmod +x /usr/local/bin/wiki-sync
+        su -s /bin/sh www-data -c wiki-sync || true
+        ( while sleep 60; do su -s /bin/sh www-data -c wiki-sync || true; done ) &
+        exec /entrypoint.sh "$$@"
+      - wiki-start
+    command: ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+
+volumes:
+  wiki-data:

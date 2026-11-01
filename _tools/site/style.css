@@ -1,0 +1,88 @@
+/* One readable column, Wikipedia's link blue, nothing that costs an old phone. */
+:root {
+  --bg: #f6f7f9; --surface: #fff; --ink: #1c2027; --muted: #5d6675; --rule: #dde2e8;
+  --accent: #3366cc; --missing: #ba3b2a; --code: #f1f3f6; --mark: #fff3b0;
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0f1216; --surface: #171b21; --ink: #e7eaef; --muted: #9ca5b4; --rule: #2a3039;
+    --accent: #8ab4f8; --missing: #f28b7a; --code: #1f242c; --mark: #5c4d00; color-scheme: dark; }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 1.0625rem/1.65 var(--body); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a.missing { color: var(--missing); }
+
+.top { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  max-width: 50rem; margin: 0 auto; padding: 14px 16px 6px; }
+.top .home { font: 600 1.15rem/1.2 var(--display); color: var(--ink); }
+.search { position: relative; flex: 1 1 12rem; max-width: 20rem; margin: 0; }
+.search input { width: 100%; font: inherit; font-size: 1rem; padding: 7px 12px; border-radius: 999px;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
+.results { position: absolute; right: 0; left: 0; top: calc(100% + 6px); z-index: 5; background: var(--surface);
+  border: 1px solid var(--rule); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); max-height: 70vh; overflow: auto; }
+.results a, .search-list a { display: block; padding: 8px 12px; color: var(--ink); }
+.results a:hover, .results a.on { background: var(--code); text-decoration: none; }
+.results small, .search-list small { display: block; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+.search-list { list-style: none; padding: 0; }
+
+main { max-width: 50rem; margin: 0 auto; padding: 0 16px 80px; }
+.crumbs { font-size: .9rem; color: var(--muted); margin: 6px 0 0; }
+.crumbs span { margin: 0 4px; opacity: .6; }
+.page { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 8px 22px 22px; margin-top: 10px; overflow-wrap: break-word; }
+@media (max-width: 560px) { .page { padding: 4px 14px 16px; border-radius: 0; margin-left: -16px; margin-right: -16px; border-left: 0; border-right: 0; } }
+
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 600; line-height: 1.25; margin: 1.6em 0 .5em; }
+h1 { font-size: 2rem; margin-top: .6em; }
+h2 { font-size: 1.45rem; padding-bottom: 4px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.2rem; } h4 { font-size: 1.05rem; }
+h1 + hr, .tools + hr { display: none; }
+.anchor { margin-left: .35em; font-size: .7em; opacity: 0; color: var(--muted); }
+h1:hover .anchor, h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus { opacity: 1; }
+hr { border: 0; border-top: 1px solid var(--rule); margin: 1.5em 0; }
+img, video { max-width: 100%; height: auto; }
+blockquote { margin: 1em 0; padding: 2px 16px; border-left: 3px solid var(--rule); color: var(--muted); }
+mark { background: var(--mark); color: inherit; }
+sup a { padding: 0 1px; }
+
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: -4px 0 18px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: .9rem; line-height: 1;
+  padding: 8px 12px; border-radius: 999px; border: 1px solid var(--rule); background: var(--bg); color: var(--ink); cursor: pointer; }
+.btn:hover { border-color: var(--accent); text-decoration: none; }
+.btn svg { width: 14px; height: 14px; fill: currentColor; }
+.listen { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.listen audio { height: 36px; max-width: 100%; }
+.listen select { font: inherit; font-size: .9rem; padding: 6px; border-radius: 8px; border: 1px solid var(--rule); background: var(--bg); color: var(--ink); }
+.listen.on .listen-btn { display: none; }
+.dim, .stale { color: var(--muted); font-size: .85rem; }
+
+table { border-collapse: collapse; margin: 1em 0; display: block; overflow-x: auto; max-width: 100%; font-size: .95rem; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: var(--code); }
+/* the infobox: a table whose header row is the subject in bold */
+table.infobox { float: right; clear: right; margin: 0 0 1em 1.2em; max-width: 22rem; font-size: .9rem; }
+@media (max-width: 700px) { table.infobox { float: none; margin: 1em 0; max-width: 100%; } }
+
+code, pre { font-family: var(--mono); font-size: .88em; }
+:not(pre) > code { background: var(--code); padding: 1px 5px; border-radius: 5px; }
+pre { background: var(--code); padding: 12px 14px; border-radius: 8px; overflow-x: auto; line-height: 1.45; }
+.highlight pre { margin: 0; }
+.highlight { margin: 1em 0; border-radius: 8px; }
+pre.mermaid { background: transparent; text-align: center; }
+
+.quote-alert, .alert { border: 1px solid var(--rule); border-left: 4px solid var(--accent); border-radius: 8px; padding: 8px 14px; margin: 1em 0; background: var(--bg); }
+.quote-alert-header, .alert-heading { font-weight: 600; margin: 4px 0; font-size: 1rem; font-family: var(--body); }
+.quote-alert-warning, .quote-alert-caution, .alert-danger, .alert-secondary { border-left-color: #d08700; }
+.quote-alert-tip, .alert-success { border-left-color: #1a8a50; }
+.quote-alert p, .alert p { margin: .4em 0; }
+details { border: 1px solid var(--rule); border-radius: 8px; padding: 6px 12px; margin: 1em 0; }
+summary { cursor: pointer; font-weight: 600; }
+.task-list-item { list-style: none; } .task-list-item input { margin: 0 6px 0 -1.3em; }
+.footnotes { font-size: .92rem; }
+.children ul { padding-left: 1.1em; } .children li { margin: .35em 0; }
+.children .dim { display: block; line-height: 1.45; }
+.pagefoot { font-size: .85rem; color: var(--muted); margin: 14px 4px; }

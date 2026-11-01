@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wiki Articles for Discord</title>
+<meta name="description" content="Turn any topic into a sourced, Wikipedia-style article with DeepSeek, ready to post on Discord.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Wiki Articles for Discord">
+<meta property="og:description" content="Turn any topic into a sourced, Wikipedia-style article with DeepSeek, ready to post on Discord.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<style>
+/* Layout: one narrow column that reads like a reference list. Steps are numbered like citations, and the step you are on is tinted the way a clicked reference is. */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #1c2027;
+  --muted: #5d6675;
+  --rule: #dde2e8;
+  --accent: #3366cc;
+  --on-accent: #ffffff;
+  --target: #eaf3ff;
+  --done: #14804a;
+  --warn: #9a5a00;
+  --scrim: rgba(15, 18, 22, 0.45);
+  --shadow: 0 8px 28px rgba(15, 18, 22, 0.18);
+  --toast-bg: #1c2027;
+  --toast-ink: #ffffff;
+  --display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --ink: #e7eaef; --muted: #9ca5b4; --rule: #2a3039;
+    --accent: #8ab4f8; --on-accent: #0b1322; --target: #172539; --done: #5cc98f; --warn: #e3a857;
+    --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    --toast-bg: #e7eaef; --toast-ink: #0f1216;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --surface: #171b21; --ink: #e7eaef; --muted: #9ca5b4; --rule: #2a3039;
+  --accent: #8ab4f8; --on-accent: #0b1322; --target: #172539; --done: #5cc98f; --warn: #e3a857;
+  --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  --toast-bg: #e7eaef; --toast-ink: #0f1216;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 112px;
+  -webkit-tap-highlight-color: transparent;
+}
+.page { max-width: 36rem; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+h1, h2, h3, p { margin: 0; }
+a { color: var(--accent); }
+
+.masthead { display: flex; flex-direction: column; gap: 12px; }
+h1 {
+  font: 600 clamp(1.9rem, 7.4vw, 2.5rem)/1.12 var(--display);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.masthead-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.tagline { color: var(--muted); font-size: 1.0625rem; max-width: 30ch; }
+.ext {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 0 14px;
+  border: 1px solid var(--rule); border-radius: 999px;
+  background: var(--surface);
+  font-weight: 600; font-size: 0.9375rem; text-decoration: none;
+  white-space: nowrap;
+}
+.ext svg { flex: none; }
+
+.block { display: flex; flex-direction: column; gap: 10px; }
+.block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.label { font: 600 1.25rem/1.3 var(--display); text-wrap: balance; }
+.hint { color: var(--muted); font-size: 0.9375rem; }
+
+.file {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px;
+  min-height: 68px; padding: 12px 10px 12px 14px;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+  color: var(--ink); text-decoration: none;
+}
+.file-icon { color: var(--muted); flex: none; }
+.file-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.file-name { color: var(--accent); font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.file-meta { color: var(--muted); font-size: 0.875rem; }
+.file-meta .ok { color: var(--done); font-weight: 600; }
+.file-go { width: 44px; height: 44px; display: grid; place-items: center; color: var(--accent); border-radius: 8px; }
+a.file:hover .file-name { text-decoration: underline; }
+a.file:active { background: var(--target); }
+
+textarea {
+  display: block; width: 100%;
+  font: 400 1.0625rem/1.5 var(--body);
+  color: var(--ink); background: var(--surface);
+  border: 1px solid var(--rule); border-radius: 10px;
+  padding: 12px 14px; resize: vertical;
+}
+textarea::placeholder { color: var(--muted); opacity: 0.9; }
+#topic { min-height: 5.75rem; overflow: hidden; resize: none; }
+#article { font: 400 1rem/1.5 var(--mono); height: 9.5rem; }
+
+.btn {
+  appearance: none; -webkit-appearance: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; min-height: 52px; padding: 0 20px;
+  border: 1.5px solid var(--accent); border-radius: 10px;
+  background: var(--accent); color: var(--on-accent);
+  font: 600 1.0625rem/1.2 var(--body);
+  cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+.btn.secondary { background: transparent; color: var(--accent); }
+.btn.ok, .btn.secondary.ok { background: var(--done); border-color: var(--done); color: var(--on-accent); }
+.btn.small { width: auto; min-height: 44px; padding: 0 16px; font-size: 1rem; }
+.btn-row { display: flex; gap: 10px; }
+.btn-row .btn { flex: 1 1 0; }
+.text-btn {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  min-height: 44px; padding: 0 4px 0 12px;
+  font: 600 0.9375rem/1 var(--body); color: var(--accent);
+  touch-action: manipulation;
+}
+.text-btn.armed { color: var(--warn); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+textarea:focus-visible, textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+
+.steps {
+  list-style: none; margin: 0; padding: 0;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 12px;
+  overflow: hidden;
+}
+.step {
+  display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); column-gap: 8px;
+  padding: 18px 16px 20px 12px;
+  border-top: 1px solid var(--rule);
+  scroll-margin-block: 96px;
+}
+.step:first-child { border-top: 0; }
+.step.is-current { background: var(--target); }
+.mark { font: 600 1.0625rem/1.45 var(--body); font-variant-numeric: tabular-nums; color: var(--accent); text-align: right; }
+.step.is-done .mark { color: var(--done); }
+.step-body { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.step-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.step h3 { font: 600 1.125rem/1.45 var(--body); }
+.tick { color: var(--done); margin-left: 6px; }
+.step:not(.is-done) .tick { display: none; }
+.tag { flex: none; font: 600 0.75rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.pill {
+  display: inline-block; padding: 0 8px;
+  border: 1px solid var(--accent); border-radius: 999px;
+  color: var(--accent); font-weight: 600; font-size: 0.875em; line-height: 1.45;
+  white-space: nowrap;
+}
+
+.save { padding: 18px 16px 20px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; scroll-margin-block: 96px; }
+.save.is-current { background: var(--target); }
+.save .block-head { margin-top: -6px; }
+.result { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+.result .file { background: var(--bg); }
+.warn { color: var(--warn); font-weight: 600; font-size: 0.9375rem; }
+
+.trouble { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; }
+.trouble > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 56px; padding: 0 16px;
+  font: 600 1.0625rem/1.3 var(--body);
+}
+.trouble > summary::-webkit-details-marker { display: none; }
+.trouble > summary::after { content: "+"; font: 400 1.5rem/1 var(--body); color: var(--muted); }
+.trouble[open] > summary::after { content: "\2212"; }
+.trouble dl { margin: 0; padding: 4px 16px 18px; display: flex; flex-direction: column; gap: 18px; }
+.trouble dt { font-weight: 600; }
+.trouble dd { margin: 4px 0 0; color: var(--muted); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+
+footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+  transform: translate(-50%, 16px); opacity: 0; pointer-events: none;
+  width: max-content; max-width: calc(100% - 32px);
+  padding: 12px 20px; border-radius: 999px;
+  background: var(--toast-bg); color: var(--toast-ink); box-shadow: var(--shadow);
+  font-weight: 600; font-size: 0.9375rem; text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.sheet {
+  position: fixed; inset: 0; z-index: 30;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: var(--scrim);
+  padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.sheet-card {
+  width: 100%; max-width: 36rem; max-height: 85%;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 18px; border-radius: 14px;
+  background: var(--surface); box-shadow: var(--shadow);
+}
+.sheet-card h2 { font: 600 1.25rem/1.3 var(--display); }
+.sheet-card textarea { flex: 1 1 auto; min-height: 10rem; font: 400 1rem/1.45 var(--mono); resize: none; }
+
+@media (min-width: 640px) {
+  body { padding-block: 48px 112px; }
+  .btn { width: auto; min-width: 13rem; }
+  .btn-row .btn { flex: 0 0 auto; }
+  .step { padding: 20px 22px 22px 14px; grid-template-columns: 2.75rem minmax(0, 1fr); column-gap: 12px; }
+  .save { padding: 20px 22px 22px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ready .btn, .ready .step, .ready .save { transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease; }
+  .ready .toast { transition: opacity 200ms ease, transform 200ms ease; }
+  .btn:active { transform: translateY(1px); }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <h1>Wiki Articles for Discord</h1>
+    <div class="masthead-row">
+      <p class="tagline">Turn any topic into a sourced, Wikipedia-style article with DeepSeek.</p>
+      <a class="ext" href="https://chat.deepseek.com/" target="_blank" rel="noopener">Open DeepSeek<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3h7v7M13 3 4 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </header>
+
+  <section class="block" aria-labelledby="guide-label">
+    <h2 class="label" id="guide-label">Get the guide</h2>
+    <a class="file" id="guide" href="guide.md" download="Wiki articles for discord (DeepSeek).md">
+      <svg class="file-icon" width="26" height="32" viewBox="0 0 26 32" aria-hidden="true"><path d="M4 1.5h11.5L23.5 9.5V29a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 29V3A1.5 1.5 0 0 1 4 1.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15.5 1.5v8h8M7 16h12M7 20.5h12M7 25h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="file-text">
+        <span class="file-name">Wiki articles for discord (DeepSeek).md</span>
+        <span class="file-meta" id="guide-meta">65.7 KB · You attach it in steps 1 and 5</span>
+      </span>
+      <span class="file-go" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 20 20"><path d="M10 3v10M5.5 8.5 10 13l4.5-4.5M4 16.5h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+    <div class="block" id="guide-fallback" hidden>
+      <p class="hint">Saving files is blocked here. Copy the guide, paste it into a new file, and name it Wiki articles for discord (DeepSeek).md</p>
+      <button class="btn secondary" type="button" id="copy-guide">Copy the guide</button>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="topic-label">
+    <div class="block-head">
+      <label class="label" id="topic-label" for="topic">What’s the article about?</label>
+      <button class="text-btn" type="button" id="reset" hidden>New article</button>
+    </div>
+    <textarea id="topic" rows="3" autocomplete="off" placeholder="e.g. The history of macaroni and cheese in America, and where the words macaroni and cheese come from"></textarea>
+    <p class="hint">Name the subject and anything you especially want covered.</p>
+  </section>
+
+  <ol class="steps" aria-label="Steps">
+    <li class="step" data-step="1">
+      <span class="mark" aria-hidden="true">[1]</span>
+      <div class="step-body">
+        <div class="step-head"><h3>Plan<span class="tick" aria-hidden="true">✓</span></h3><span class="tag">New chat</span></div>
+        <p>Turn on <span class="pill">DeepThink</span> and <span class="pill">Search</span>, attach the guide, then paste and send.</p>
+        <button class="btn" type="button" data-copy="1">Copy step 1</button>
+      </div>
+    </li>
+    <li class="step" data-step="2">
+      <span class="mark" aria-hidden="true">[2]</span>
+      <div class="step-body">
+        <div class="step-head"><h3>Research<span class="tick" aria-hidden="true">✓</span></h3><span class="tag">Same chat</span></div>
+        <p>When the reply has finished, paste and send.</p>
+        <button class="btn secondary" type="button" data-copy="2">Copy step 2</button>
+      </div>
+    </li>
+    <li class="step" data-step="3">
+      <span class="mark" aria-hidden="true">[3]</span>
+      <div class="step-body">
+        <div class="step-head"><h3>Fill the gaps<span class="tick" aria-hidden="true">✓</span></h3><span class="tag">Same chat</span></div>
+        <p>When the reply has finished, paste and send.</p>
+        <button class="btn secondary" type="button" data-copy="3">Copy step 3</button>
+      </div>
+    </li>
+    <li class="step" data-step="4">
+      <span class="mark" aria-hidden="true">[4]</span>
+      <div class="step-body">
+        <div class="step-head"><h3>Write<span class="tick" aria-hidden="true">✓</span></h3><span class="tag">Same chat</span></div>
+        <p>When the reply has finished, paste and send. DeepSeek answers with one code block.</p>
+        <button class="btn secondary" type="button" data-copy="4">Copy step 4</button>
+      </div>
+    </li>
+    <li class="step" data-step="5">
+      <span class="mark" aria-hidden="true">[5]</span>
+      <div class="step-body">
+        <div class="step-head"><h3>Check<span class="tick" aria-hidden="true">✓</span></h3><span class="tag">New chat</span></div>
+        <p>Copy that code block. In a new chat, turn on <span class="pill">DeepThink</span> and <span class="pill">Search</span>, attach the guide, then paste and send.</p>
+      </div>
+    </li>
+  </ol>
+
+  <section class="block save" id="save" aria-labelledby="save-label">
+    <div class="block-head">
+      <h2 class="label" id="save-label">Save for Discord</h2>
+      <button class="text-btn" type="button" id="paste" hidden>Paste</button>
+    </div>
+    <p>Copy the final code block from step 5 and paste it here.</p>
+    <textarea id="article" rows="6" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste the final article"></textarea>
+    <div class="result" id="result" hidden>
+      <div class="file">
+        <svg class="file-icon" width="26" height="32" viewBox="0 0 26 32" aria-hidden="true"><path d="M4 1.5h11.5L23.5 9.5V29a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 29V3A1.5 1.5 0 0 1 4 1.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M15.5 1.5v8h8M7 16h12M7 20.5h12M7 25h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="file-text">
+          <span class="file-name" id="out-name"></span>
+          <span class="file-meta" id="out-meta"></span>
+        </span>
+      </div>
+      <p class="warn" id="out-warn" hidden></p>
+      <div class="btn-row">
+        <button class="btn" type="button" id="download">Download</button>
+        <button class="btn secondary" type="button" id="share" hidden>Share</button>
+      </div>
+      <p class="hint">Read DeepSeek’s short report before you share. A reference marked unchecked wasn’t verified.</p>
+    </div>
+  </section>
+
+  <details class="trouble" id="trouble">
+    <summary>Something went wrong?</summary>
+    <dl>
+      <div><dt>The article showed up as formatted text</dt><dd>Send the same step again.</dd></div>
+      <div><dt>A reply stopped partway</dt><dd><span>Send the same step again. If step 4 stops again, send this shorter version.</span><button class="btn secondary small" type="button" data-copy="4short">Copy shorter step 4</button></dd></div>
+      <div><dt>The step 4 code block doesn’t start with “Step 5 of 5”</dt><dd><span>In the new chat, paste this first, then the article.</span><button class="btn secondary small" type="button" data-copy="5">Copy step 5</button></dd></div>
+      <div><dt>The report says many references are unchecked</dt><dd><span>Paste the article in Save for Discord, then send this in another new chat with the guide attached.</span><button class="btn secondary small" type="button" data-copy="recheck">Copy a second check</button></dd></div>
+      <div><dt>DeepSeek found no reliable sources</dt><dd>Try a broader topic.</dd></div>
+    </dl>
+  </details>
+
+  <footer>Guide updated October 29, 2026 · Articles are in American English</footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-card">
+    <h2 id="sheet-title">Copy this text</h2>
+    <p class="hint">Your browser blocked the copy button. Select all of the text below and copy it.</p>
+    <textarea id="sheet-text" readonly></textarea>
+    <button class="btn" type="button" id="sheet-done">Done</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var EMBEDDED = {"1": "Step 1 of 5: plan. Search only for Wikipedia articles in this step, and write no article text. Keep this reply under 1,000 words, and write it in English.\n\nRead the attached file \"Wiki articles for discord (DeepSeek).md\" and follow it, especially Part 1.\n\nThe article will be about: [describe the topic in your own words, including anything you especially want covered]\n\nRead this description carefully. The article is about the main subject it names, under the title Wikipedia would give that subject. Everything else the description asks for, such as a period, a place, a person or where a word comes from, is covered inside the sections where it belongs. If the description names several subjects, the article is about the broadest one, and the others become sections. A question or opinion becomes an article about the subject or the debate, under a neutral title.\n\nRead the English Wikipedia article on the subject, and the articles on the parts the description asks for. If there is none, read the closest related ones, and if you find nothing at all, say so in one line. Use these articles only to decide what the article must cover.\n\nReply with these four lists and nothing else.\n\nFirst, the article title and the most specific type from Part 6 that fits it.\n\nSecond, an outline: the usual sections Part 6 gives for this type, in time order for a history, each with its scope in a few words and no dates or figures. The parts the description asks for go inside the sections where they belong, never in a separate section at the end.\n\nThird, under each section, research questions that a newcomer would want answered, most important first, 25 to 40 in all. The parts the description asks for, if any, get the most questions, but the other usual sections get at least a third of them, so that the article also covers the subject as a whole. Cover the subject's whole history, not only recent news: at most two questions may be about the last two years. Add one question about the most important recent development (Part 2.4), if there has been one. Write the questions only. Do not answer them, and include no date, figure or name that answers them.\n\nFourth, up to eight works from the Wikipedia article's reference list that look most useful, by author and title only, copied from the list. Pages are often cut off when read: if you cannot see the reference list, write \"Reference list not visible\" and never guess a title.", "2": "Step 2 of 5: research. Write no article text yet. Keep this reply under 2,500 words, and write it in English.\n\nAnswer the Step 1 questions from reliable pages that you read yourself in this step, following Part 2 of the attached file. Search separately for each section's questions, including the subject's history and origins, and search for the works on the Step 1 list. Never use Wikipedia, and never use facts from memory: every fact must come from a page your search shows you now. If your searches find few or no reliable sources, say so in one line at the top, then follow Part 5.8.\n\nReply with these three parts and nothing else.\n\nFirst, the sources. Number them 1, 2, 3 and so on, and use exactly this layout for each one, with no paragraphs of prose:\n\nSource 1: authors if shown; date; title; publication or website; URL of the page you read; DOI or ISBN only if that page shows one.\nFact: one fact in your own words, not the quotation's wording, naming exactly what it applies to. Quote: \"up to twenty words copied exactly from that page, containing every name, number and date in the fact\"\nFact: the next fact from the same page, in the same layout.\n\nList each page once, with all of its facts under it, and never give the same URL two numbers. List a fact only under the page where you read it, and let it say no more than its quotation; if a fact needs a longer quotation, split it into two facts. If you cannot quote the page for a fact, the fact is not on that page: find the page that states it, or leave it out. Use as many sources as the facts need; there is no maximum, so never drop a reliable source to keep the number down. Copy every URL in full, exactly as the search result shows it, never shorten one with three dots, and cut everything from the # sign on; leave out a source whose full URL you cannot copy. Never use a test, staging, preview or hosting copy of a site, and never use Wikipedia in any form, including archived copies and mirrors. Give each page its own title, never a heading inside it, a sentence from it or a placeholder such as Basic Page Title, and give as its author only the person or organization that wrote it.\n\nSecond, the questions that no reliable page answered.\n\nThird, any disagreements between sources, with which source says what.\n\nGather 40 to 60 facts, starting with the answers to the most important questions, and keep the fact lines short so that they all fit. Before you reply, check that every source meets Part 2.2, with nothing from the never-cite list, such as wikis, blogs, travel companies, store listings or preprints, at most two encyclopedias and the subject's own pages at most a third; that every URL is the normal address of the page you read; and that the dates fit together as Part 5.5 requires.", "3": "Step 3 of 5: fill the gaps. Write no article text yet. Keep this reply under 2,500 words, and write it in English.\n\nContinue the research from Step 2, following Part 2 of the attached file. First find the gaps: every question Step 2 listed as unanswered, every section of the Step 1 outline with fewer than five facts, and every part of my topic description with fewer than ten facts. Then search for each gap separately, with at least two different searches for each: one with the name of the person, theory, place, event or study it concerns together with the subject, and one aimed at news coverage, museum or university pages, or scholarly reviews. Never use Wikipedia, and never use facts from memory: every fact must come from a page your search shows you now.\n\nReply with these three parts and nothing else.\n\nFirst, the new sources, in exactly the Step 2 layout, numbered on from Step 2: if Step 2 ended with Source 11, the first new source is Source 12. To add facts from a page that Step 2 already listed, write its Step 2 number followed by the words more facts, such as Source 4, more facts, and then the facts in the same layout. List only facts that Step 2 does not already give, and never give a page a new number if Step 2 already listed it. Every fact says no more than its quotation. Copy every URL in full, exactly as the search result shows it, and cut everything from the # sign on. Never use a test, staging, preview or hosting copy of a site, and never use Wikipedia in any form, including archived copies and mirrors. Give each page its own title and its real author.\n\nSecond, the questions that are still unanswered. The article will leave them out.\n\nThird, any new disagreements between sources, with which source says what.\n\nGather 20 to 40 new facts, starting with the parts of my topic description. Before you reply, check that every new source meets Part 2.2, with nothing from the never-cite list, such as wikis, blogs, travel companies, store listings or preprints, and that the dates fit together as Part 5.5 requires.", "4": "Step 4 of 5: write the article. Your entire reply must be one code block. Open it with four backticks and the word markdown, and close it with four backticks. Inside the code block, first copy the full text of Prompt 5 from Part 11 of the attached file, exactly and word for word, ending with its last line, ARTICLE: and then leave a blank line. After that, write the raw Markdown source of the article, starting with its title line. Do not show the article as formatted text, do not show a preview first, and write nothing outside the code block.\n\nDo not search the web in this step. Write the article in American English from your research notes only, which are your Step 2 and Step 3 replies together, following the Step 1 outline and every rule in the attached file. Use the facts in the notes and nothing else: no fact, figure, name or interpretation that is not in them. Leave out the unanswered questions.\n\nFirst clean the source list: merge sources that share a URL into one, cut everything from the # sign on in each URL, and leave out, together with its facts, any source whose title or URL the notes do not give and any source the never-cite list in Part 2.2 excludes, such as a copy of Wikipedia, a wiki, a blog or a store listing. Never make up a title, URL or other detail.\n\nThen choose the facts. Use as many as fit the outline and the word limits in Part 7, most important first. Leave out minor details, facts about a related subject rather than this one, and long runs of similar examples: of many product launches, campaigns, polls or appearances, keep the two or three that sources discuss most. News from the last two years fills at most about a quarter of the article. Write each fact once, even when several sources state it, and cite one or two of those sources for it. Never write a sentence that only says another source agrees, or that only says someone wrote, studied, explored or examined something; give what they found.\n\nBuild the article as Part 4 describes. Include an infobox if Part 6 gives one for this type, and use the section headings of the Step 1 outline as short noun phrases, without the descriptions after commas or in brackets. A section needs at least two sentences: add a single sentence to the closest related section instead, and leave out a usual section that has no facts of its own. The first sentence names the subject in bold. The lead has no citations and summarizes the body in fresh words, never repeating a body sentence word for word.\n\nIn the body, cite each fact by its number in the research notes, typed as plain text such as [1] and [2], wherever the fact belongs, and never add, move or reword a sentence to change the order in which numbers appear. Never use DeepSeek citation markers such as 【1†L1-L2】. When consecutive sentences come from the same source, cite it once after the last of them, but never end a paragraph with an uncited sentence, and never put three or more citations side by side. Two citations side by side mean each source states the whole sentence; when a sentence joins facts from two sources, put each citation right after the part it supports, and never blend figures from different sources into one claim.\n\nWrite every sentence in your own words, for a reader who is new to the subject, in paragraphs of two to seven sentences in which each sentence follows from the one before. The quotations in the notes are only for checking: never copy a sentence from a source or a quotation, and never reuse more than five words in a row from a quotation, apart from names, titles and technical terms. Explain technical terms, never state a claim more strongly than its source does, never use the word respectively, and never write a sentence about the article itself. Where sources describe the subject in different schemes or counts, give each in its own sentence with who uses it. Cover every usual section and every part the topic description asked for, as fully as the facts allow. If you run out of facts before the lower word limit, stop there; never pad.\n\nWhen the article is finished, read the body once more and delete any sentence that repeats a fact already given. Then, and only then, renumber the citations as Part 3.2 describes: the first source cited in the body becomes [1], the next new one [2], and so on. Change every citation to its new number, list the references in that order with each title linked to its URL, and leave out any source the article does not cite.\n\nReminder: your reply is one code block that opens with four backticks and the word markdown. It holds Prompt 5, copied exactly, then the article, and nothing goes outside it.", "5": "Step 5 of 5: audit. The encyclopedia article after the word ARTICLE below was written in another chat, following the attached file \"Wiki articles for discord (DeepSeek).md\". You did not write it. Check it against the web and deliver a corrected final version in American English. The goal is a correct article, not a shorter one.\n\nFollow Part 10 of the attached file exactly, in its order. For each reference, open its URL, read the page, and check every sentence that cites it. Keep what the page states, correct a figure only when the cited page itself gives a different one, and fix a reference's title, author, date or URL from its page when they are wrong. Before deleting a sentence, search for its key words and re-cite it if a reliable page states it; delete only the parts that no reliable page states. If a page is cut off, shows only a cookie or login notice, or will not open although the work exists, keep its sentences and report them as unchecked, and never change them to fit what another page says. Before any change, compare the sentence with the page's exact words. Never cite Wikipedia, never add a new fact, and never treat a date as wrong only because it is later than your training data. Remove any source that Part 2.2 does not allow, such as a blog, a wiki, a travel company, a stock-photo caption or an index copy of a paper, and re-cite or delete its sentences. When you change a reference to a different work, check every sentence that cites it. Delete any sentence that repeats a fact already given, and where two citations stand side by side, check that each page states the whole sentence. Renumber last, exactly as Part 10 describes.\n\nReply with the report described in Part 10, in at most 300 words, and then the complete final article in one code block that opens with four backticks and the word markdown and closes with four backticks. Report a reference as checked only if you read its page in this reply. Write nothing after the code block.\n\nARTICLE:"};
+  var GUIDE_TEXT = null;
+  var GUIDE_FILE = "Wiki articles for discord (DeepSeek).md";
+  var KEY = "wiki-discord:v2";
+  var SHORTER = "Keep the article under 1,200 words.";
+  var STEPS = [1, 2, 3, 4, 5];
+
+  var prompts = EMBEDDED;
+  var root = document.documentElement;
+  root.setAttribute("data-prompts", "embedded");
+  var $ = function (id) { return document.getElementById(id); };
+  var topicEl = $("topic"), articleEl = $("article"), resetBtn = $("reset");
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var inViewer = !!(window.claude && typeof window.claude.use === "function");
+
+  /* ---------- saved progress (this browser only) ---------- */
+  function blank() { return { topic: "", done: [], article: "", guide: false }; }
+  var state = blank();
+  function load() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+    state = blank();
+    if (s && typeof s === "object") {
+      if (typeof s.topic === "string") state.topic = s.topic;
+      if (typeof s.article === "string") state.article = s.article;
+      if (Array.isArray(s.done)) state.done = s.done.filter(function (n) { return STEPS.indexOf(n) >= 0; });
+      state.guide = !!s.guide;
+    } else {
+      try { var old = localStorage.getItem("wiki-topic"); if (old) state.topic = old; } catch (e) {}
+    }
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function isDone(n) { return state.done.indexOf(n) >= 0; }
+  function markDone(n) { if (!isDone(n)) { state.done.push(n); save(); } }
+  function currentStep() { for (var i = 0; i < STEPS.length; i++) if (!isDone(STEPS[i])) return STEPS[i]; return 6; }
+
+  /* ---------- prompts ---------- */
+  function topicText() { return state.topic.replace(/\s+/g, " ").trim(); }
+  function parsePrompts(md) {
+    if (typeof md !== "string") return null;
+    md = md.replace(/\r\n?/g, "\n");
+    var at = md.indexOf("## Part 11");
+    if (at < 0) return null;
+    var part = md.slice(at), out = {};
+    for (var i = 1; i <= 5; i++) {
+      var h = part.indexOf("### Prompt " + i + ":");
+      if (h < 0) return null;
+      var open = part.indexOf("```text\n", h);
+      if (open < 0) return null;
+      var from = open + 8, close = part.indexOf("\n```", from);
+      if (close < 0) return null;
+      out[i] = part.slice(from, close);
+    }
+    if (!/^The article will be about:/m.test(out[1]) || !/ARTICLE:\s*$/.test(out[5])) return null;
+    return out;
+  }
+  function syncPrompts() {
+    if (GUIDE_TEXT !== null || !window.fetch || location.protocol === "file:") return;
+    fetch("guide.md", { cache: "no-cache" })
+      .then(function (r) { return r.ok ? r.text() : null; })
+      .then(function (t) { var p = parsePrompts(t); if (p) { prompts = p; root.setAttribute("data-prompts", "guide"); } })
+      .catch(function () {});
+  }
+  function promptFor(key) {
+    if (key === "1") return prompts[1].replace(/^(The article will be about:).*$/m, function (m, lead) { return lead + " " + topicText(); });
+    if (key === "4short") return prompts[4] + "\n\n" + SHORTER;
+    if (key === "recheck") return prompts[5] + "\n\n" + (current ? current.text : "");
+    return prompts[key];
+  }
+
+  /* ---------- copying ---------- */
+  function legacyCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px;";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { ta.setSelectionRange(0, text.length); } catch (e) {}
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return legacyCopy(text); });
+    }
+    return Promise.resolve(legacyCopy(text));
+  }
+  function openSheet(text) {
+    var ta = $("sheet-text");
+    ta.value = text;
+    $("sheet").hidden = false;
+    setTimeout(function () { ta.focus(); ta.select(); try { ta.setSelectionRange(0, text.length); } catch (e) {} }, 30);
+  }
+  $("sheet-done").addEventListener("click", function () { $("sheet").hidden = true; });
+  $("sheet").addEventListener("click", function (e) { if (e.target === $("sheet")) $("sheet").hidden = true; });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") $("sheet").hidden = true; });
+
+  var toastTimer = 0;
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2800);
+  }
+  function flash(btn, label) {
+    btn.setAttribute("data-flash", "1");
+    btn.textContent = label;
+    btn.classList.add("ok");
+    setTimeout(function () { btn.removeAttribute("data-flash"); btn.classList.remove("ok"); render(); }, 1600);
+  }
+  function scrollToEl(el, smooth) {
+    if (!el) return;
+    el.scrollIntoView({ behavior: smooth && !reduceMotion ? "smooth" : "auto", block: "center" });
+  }
+  function stepEl(n) { return n <= 5 ? document.querySelector('.step[data-step="' + n + '"]') : $("save"); }
+
+  var MESSAGES = {
+    "1": "Copied. Paste it in a new DeepSeek chat.",
+    "2": "Copied. Paste it in the same chat.",
+    "3": "Copied. Paste it in the same chat.",
+    "4": "Copied. Paste it in the same chat.",
+    "4short": "Copied. Paste it in the same chat.",
+    "5": "Copied. Paste it in the new chat, then the article.",
+    "recheck": "Copied. Paste it in a new chat with the guide attached."
+  };
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest("[data-copy]") : null;
+    if (!btn) return;
+    var key = btn.getAttribute("data-copy");
+    if (key === "1" && !topicText()) {
+      topicEl.focus();
+      toast("Type what the article is about first.");
+      return;
+    }
+    if (key === "recheck" && !current) {
+      scrollToEl($("save"), true);
+      articleEl.focus({ preventScroll: true });
+      toast("Paste the article in Save for Discord first.");
+      return;
+    }
+    var text = promptFor(key);
+    copyText(text).then(function (ok) {
+      if (!ok) { openSheet(text); return; }
+      var step = key === "4short" ? 4 : (/^[1-4]$/.test(key) ? +key : 0);
+      if (step) markDone(step);
+      flash(btn, "Copied ✓");
+      render();
+      toast(MESSAGES[key]);
+      if (step) setTimeout(function () { scrollToEl(stepEl(step + 1), true); }, 450);
+    });
+  });
+
+  /* ---------- the guide file ---------- */
+  var downloads = null, downloadsReady = Promise.resolve(null);
+  if (inViewer) {
+    downloadsReady = window.claude.use("downloads").then(function (d) { downloads = d; return d; }, function () { return null; });
+  }
+  function guideSaved() { state.guide = true; save(); render(); }
+  function showGuideFallback() { $("guide").hidden = true; $("guide-fallback").hidden = false; }
+  $("guide").addEventListener("click", function (e) {
+    if (!inViewer) { guideSaved(); toast("Downloading the guide."); return; }
+    e.preventDefault();
+    downloadsReady.then(function (d) {
+      if (!d || GUIDE_TEXT === null) { showGuideFallback(); return; }
+      d.save({ filename: GUIDE_FILE, data: GUIDE_TEXT }).then(function () { guideSaved(); toast("Guide saved."); }, function (err) {
+        var code = err && err.code;
+        if (code === "declined") return;
+        if (code === "rate_limited") { toast("A save prompt is already open."); return; }
+        showGuideFallback();
+      });
+    });
+  });
+  $("copy-guide").addEventListener("click", function () {
+    var btn = this;
+    copyText(GUIDE_TEXT || "").then(function (ok) { if (ok) { flash(btn, "Copied ✓"); guideSaved(); } else openSheet(GUIDE_TEXT || ""); });
+  });
+
+  /* ---------- the finished article ---------- */
+  var current = null;
+  function clean(raw) {
+    var t = raw.replace(/\r\n?/g, "\n").replace(/ /g, " ");
+    var warnings = [];
+    if (/Step 5 of 5: audit/.test(t)) warnings.push("This is the step 4 reply. Run step 5, then paste its final article here.");
+    t = t.replace(/^[ \t]*This response is AI-generated, for reference only\.?[ \t]*$/gim, "");
+    var art = t.match(/^ARTICLE:[ \t]*$/m);
+    if (art) t = t.slice(art.index + art[0].length);
+    var lines = t.split("\n"), start = -1, firstTitle = -1;
+    for (var i = 0; i < lines.length; i++) {
+      if (!/^# \S/.test(lines[i])) continue;
+      if (firstTitle < 0) firstTitle = i;
+      var j = i + 1;
+      while (j < lines.length && !lines[j].trim()) j++;
+      if (j < lines.length && /^-{3,}\s*$/.test(lines[j])) { start = i; break; }
+    }
+    if (start < 0) start = firstTitle;
+    var body = start >= 0 ? lines.slice(start) : lines.slice();
+    while (body.length && !body[0].trim()) body.shift();
+    while (body.length && !body[body.length - 1].trim()) body.pop();
+    if (body.length && /^\s*`{3,}[\w-]*\s*$/.test(body[0])) body.shift();
+    var fences = body.filter(function (l) { return /^\s*`{3,}/.test(l); }).length;
+    if (body.length && /^\s*`{3,}\s*$/.test(body[body.length - 1]) && (fences % 2 === 1 || /^\s*`{4,}/.test(body[body.length - 1]))) body.pop();
+    while (body.length && !body[body.length - 1].trim()) body.pop();
+    var text = body.join("\n").trim();
+    if (!text) return null;
+    var title = start >= 0 ? lines[start].replace(/^#\s+/, "").trim() : "";
+    var name = title.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[*_`]/g, "").replace(/[\\\/:*?"<>|]/g, "").replace(/\s+/g, " ").trim().replace(/[. ]+$/, "");
+    if (name.length > 100) name = name.slice(0, 100).trim();
+    var parts = text.split(/\n##\s+References\b/);
+    var words = parts[0].replace(/^# .*$/m, "").split(/\s+/).filter(function (w) { return /[0-9A-Za-zÀ-￿]/.test(w); }).length;
+    var refs = parts.length > 1 ? (parts[1].match(/^\s*\d+\.\s+\S/gm) || []).length : 0;
+    if (start < 0) warnings.push("There’s no title line. Make sure you copied the whole code block.");
+    else if (parts.length < 2) warnings.push("There’s no References section, so the reply may have stopped early. Send step 5 again.");
+    if (/[【】†]/.test(text)) warnings.push("It still has DeepSeek’s own citation marks. Run step 5 again.");
+    return { text: text + "\n", title: title, filename: (name || "Article") + ".md", words: words, refs: refs, warnings: warnings };
+  }
+  function sizeLabel(bytes) {
+    var kb = bytes / 1024;
+    return (kb < 100 ? kb.toFixed(1) : Math.round(kb)) + " KB";
+  }
+  function fmt(n) { return n.toLocaleString("en-US"); }
+  function makeFile(r) {
+    try { return new File([r.text], r.filename, { type: "text/markdown" }); } catch (e) { return null; }
+  }
+  var canShareFiles = function (file) {
+    try { return !inViewer && !!(file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })); } catch (e) { return false; }
+  };
+  function processArticle(fromUser) {
+    var raw = articleEl.value;
+    state.article = raw;
+    current = raw.trim() ? clean(raw) : null;
+    if (fromUser) {
+      if (current) state.done = STEPS.slice();
+      save();
+    }
+    var out = $("result");
+    if (!current) { out.hidden = true; render(); return; }
+    out.hidden = false;
+    $("out-name").textContent = current.filename;
+    var bytes = new Blob([current.text]).size;
+    $("out-meta").textContent = sizeLabel(bytes) + " · " + fmt(current.words) + " words · " + current.refs + (current.refs === 1 ? " reference" : " references");
+    var w = $("out-warn");
+    w.textContent = current.warnings.join(" ");
+    w.hidden = !current.warnings.length;
+    $("share").hidden = !canShareFiles(makeFile(current));
+    render();
+  }
+  articleEl.addEventListener("input", function () { processArticle(true); });
+
+  function saveBlob(name, text) {
+    var blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = name;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+  }
+  $("download").addEventListener("click", function () {
+    if (!current) return;
+    var r = current, btn = this;
+    if (!inViewer) { saveBlob(r.filename, r.text); flash(btn, "Saved ✓"); toast("Saved " + r.filename); return; }
+    downloadsReady.then(function (d) {
+      if (!d) {
+        copyText(r.text).then(function (ok) { if (ok) { flash(btn, "Copied ✓"); toast("Saving is blocked here, so the article was copied instead."); } else openSheet(r.text); });
+        return;
+      }
+      d.save({ filename: r.filename, data: r.text }).then(function () { flash(btn, "Saved ✓"); toast("Saved " + r.filename); }, function (err) {
+        var code = err && err.code;
+        if (code === "declined") return;
+        if (code === "rate_limited") { toast("A save prompt is already open."); return; }
+        openSheet(r.text);
+      });
+    });
+  });
+  $("share").addEventListener("click", function () {
+    if (!current) return;
+    var file = makeFile(current);
+    if (!canShareFiles(file)) { $("share").hidden = true; return; }
+    navigator.share({ files: [file], title: current.title }).catch(function (err) {
+      if (err && err.name === "AbortError") return;
+      toast("Sharing didn’t work here. Use Download instead.");
+    });
+  });
+  if (!inViewer && navigator.clipboard && navigator.clipboard.readText) $("paste").hidden = false;
+  $("paste").addEventListener("click", function () {
+    navigator.clipboard.readText().then(function (t) {
+      if (!t || !t.trim()) { toast("The clipboard is empty."); return; }
+      articleEl.value = t;
+      processArticle(true);
+    }, function () {
+      articleEl.focus();
+      toast("Paste into the box below.");
+    });
+  });
+
+  /* ---------- starting over ---------- */
+  var armed = 0, armTimer = 0;
+  resetBtn.addEventListener("click", function () {
+    if (Date.now() - armed < 3500) {
+      clearTimeout(armTimer);
+      armed = 0;
+      var keepGuide = state.guide;
+      state = blank();
+      state.guide = keepGuide;
+      save();
+      topicEl.value = "";
+      articleEl.value = "";
+      current = null;
+      $("result").hidden = true;
+      $("trouble").open = false;
+      resetBtn.textContent = "New article";
+      resetBtn.classList.remove("armed");
+      grow();
+      render();
+      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+      topicEl.focus({ preventScroll: true });
+      toast("Cleared. Ready for a new article.");
+      return;
+    }
+    armed = Date.now();
+    resetBtn.textContent = "Tap again to clear";
+    resetBtn.classList.add("armed");
+    clearTimeout(armTimer);
+    armTimer = setTimeout(function () { armed = 0; resetBtn.textContent = "New article"; resetBtn.classList.remove("armed"); }, 3500);
+  });
+
+  /* ---------- drawing the page ---------- */
+  function grow() {
+    topicEl.style.height = "auto";
+    topicEl.style.height = Math.max(topicEl.scrollHeight + 2, 0) + "px";
+  }
+  topicEl.addEventListener("input", function () { state.topic = topicEl.value; save(); grow(); render(); });
+  function render() {
+    var cur = currentStep();
+    var steps = document.querySelectorAll(".step");
+    for (var i = 0; i < steps.length; i++) {
+      var li = steps[i], n = +li.getAttribute("data-step"), done = isDone(n);
+      li.classList.toggle("is-done", done);
+      li.classList.toggle("is-current", n === cur);
+      if (n === cur) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+      var b = li.querySelector("[data-copy]");
+      if (b && !b.hasAttribute("data-flash")) {
+        b.textContent = done ? "Copy step " + n + " again" : "Copy step " + n;
+        b.classList.toggle("secondary", n !== cur);
+      }
+    }
+    $("save").classList.toggle("is-current", cur === 6);
+    resetBtn.hidden = !(state.topic.trim() || state.done.length || state.article.trim());
+    var meta = $("guide-meta");
+    if (state.guide) {
+      meta.textContent = "";
+      var ok = document.createElement("span");
+      ok.className = "ok";
+      ok.textContent = "Downloaded ✓";
+      meta.appendChild(ok);
+      meta.appendChild(document.createTextNode(" · You attach it in steps 1 and 5"));
+    }
+  }
+
+  load();
+  topicEl.value = state.topic;
+  articleEl.value = state.article;
+  grow();
+  processArticle(false);
+  render();
+  syncPrompts();
+  if (state.done.length) {
+    try { history.scrollRestoration = "manual"; } catch (e) {}
+    requestAnimationFrame(function () { scrollToEl(stepEl(currentStep()), false); });
+  }
+  requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.add("ready"); }); });
+  window.addEventListener("storage", function (e) {
+    if (e.key !== KEY) return;
+    load();
+    if (document.activeElement !== topicEl) { topicEl.value = state.topic; grow(); }
+    if (document.activeElement !== articleEl) articleEl.value = state.article;
+    processArticle(false);
+  });
+})();
+</script>
+
+</body>
+</html>
