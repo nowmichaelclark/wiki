@@ -117,6 +117,19 @@ textarea {
 }
 textarea::placeholder { color: var(--muted); opacity: 0.9; }
 #topic { min-height: 5.75rem; overflow: hidden; resize: none; }
+.back { color: var(--accent); text-decoration: none; font-size: 0.9375rem; align-self: flex-start; }
+.back:hover { text-decoration: underline; }
+select, input[type=text], input[type=password] {
+  display: block; width: 100%; font: 400 1rem/1.4 var(--body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; min-height: 44px;
+}
+input[type=file] { font: inherit; color: var(--ink); max-width: 100%; }
+.wanted, .field { display: flex; flex-direction: column; gap: 6px; }
+.field > span { font-weight: 600; font-size: 0.9375rem; }
+.choice { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.choice label { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+#add-status a { color: var(--accent); }
+#add-status.bad { color: var(--warn); font-weight: 600; }
 #article { font: 400 1rem/1.5 var(--mono); height: 9.5rem; }
 
 .btn {
@@ -236,6 +249,7 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
 <body>
 <main class="page">
   <header class="masthead">
+    <a class="back" href="../../">&larr; Workshop Wiki</a>
     <h1>Wiki Articles for Discord</h1>
     <div class="masthead-row">
       <p class="tagline">Turn any topic into a sourced, Wikipedia-style article with DeepSeek.</p>
@@ -266,6 +280,10 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
     </div>
     <textarea id="topic" rows="3" autocomplete="off" placeholder="e.g. The history of macaroni and cheese in America, and where the words macaroni and cheese come from"></textarea>
     <p class="hint">Name the subject and anything you especially want covered.</p>
+    <div class="wanted" id="wanted" hidden>
+      <label class="hint" for="wanted-list">Or pick one the wiki wants:</label>
+      <select id="wanted-list"><option value="">Wanted articles</option></select>
+    </div>
   </section>
 
   <ol class="steps" aria-label="Steps">
@@ -332,6 +350,28 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
       </div>
       <p class="hint">Read DeepSeek’s short report before you share. A reference marked unchecked wasn’t verified.</p>
     </div>
+  </section>
+
+  <section class="block add" id="add" aria-labelledby="add-label">
+    <h2 class="label" id="add-label">Add to the wiki</h2>
+    <p class="hint">Put the article above, or any Markdown page, image or other file, straight into the wiki. It shows on the website a few minutes later.</p>
+    <div class="choice" role="radiogroup" aria-label="What to add">
+      <label><input type="radio" name="add-src" value="article" checked> The article above</label>
+      <label><input type="radio" name="add-src" value="files"> Files from this device</label>
+    </div>
+    <div id="add-files-row" hidden>
+      <input type="file" id="add-files" multiple>
+      <p class="hint">A <code>.md</code> file becomes a page, titled by its first <code>#</code> line. Any other file is attached to the page you choose below, ready to link or embed.</p>
+    </div>
+    <label class="field"><span>Put it under</span><select id="add-under"></select></label>
+    <label class="field" id="add-title-row"><span>Page title</span><input type="text" id="add-title" autocomplete="off"></label>
+    <div id="add-token-row" hidden>
+      <label class="field"><span>GitHub token</span><input type="password" id="add-token" autocomplete="off" placeholder="github_pat_..."></label>
+      <p class="hint">Needed once on each device. Use a fine-grained token with access to the wiki repo only and Contents set to Read and write, the same kind the Otterwiki editor uses (<a href="../../wiki/otterwiki-editor/#first-time-setup">how to make one</a>). It stays in this browser and is sent only to GitHub.</p>
+    </div>
+    <button class="btn" type="button" id="add-go">Add to the wiki</button>
+    <p class="hint" id="add-status" role="status" aria-live="polite"></p>
+    <button class="text-btn" type="button" id="add-forget" hidden>Forget the token on this device</button>
   </section>
 
   <details class="trouble" id="trouble">
@@ -602,7 +642,7 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
       save();
     }
     var out = $("result");
-    if (!current) { out.hidden = true; render(); return; }
+    if (!current) { out.hidden = true; render(); try { document.dispatchEvent(new Event("wiki:article")); } catch (e) {} return; }
     out.hidden = false;
     $("out-name").textContent = current.filename;
     var bytes = new Blob([current.text]).size;
@@ -612,6 +652,7 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
     w.hidden = !current.warnings.length;
     $("share").hidden = !canShareFiles(makeFile(current));
     render();
+    try { document.dispatchEvent(new Event("wiki:article")); } catch (e) {}
   }
   articleEl.addEventListener("input", function () { processArticle(true); });
 
@@ -730,6 +771,17 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
     }
   }
 
+  window.wikiHelper = {
+    current: function () { return current; },
+    topic: function () { return state.topic; },
+    hasProgress: function () { return state.done.length > 0 || !!state.article.trim(); },
+    startTopic: function (t) {
+      var g = state.guide;
+      state = blank(); state.guide = g; state.topic = t; save();
+      topicEl.value = t; articleEl.value = ""; current = null; $("result").hidden = true;
+      grow(); processArticle(false); render();
+    }
+  };
   load();
   topicEl.value = state.topic;
   articleEl.value = state.article;
@@ -752,5 +804,232 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
 })();
 </script>
 
+<script>
+/* Wiki link-up: pick a topic from the wiki's wanted list, and add pages and files to the wiki
+   through GitHub's API with a token kept in this browser. */
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var H = window.wikiHelper;
+  if (!H) return;
+  var ROOT = "../../";
+  var TOKEN_KEY = "wiki-gh-token", WANTED_KEY = "wiki-helper-wanted";
+  var cfg = null, pages = [], wanted = {};
+
+  function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function set(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function slug(path) {
+    var re; try { re = new RegExp("[^\\p{L}\\p{N}_]+", "gu"); } catch (e) { re = /[^a-z0-9_]+/g; }
+    if (path.toLowerCase() === "home") return "";
+    return path.split("/").map(function (p) { return p.normalize("NFKC").toLowerCase().replace(re, "-").replace(/^[-_]+|[-_]+$/g, "") || "page"; }).join("/");
+  }
+  function pageUrl(path) { var s = slug(path); return cfg.site_url + (s ? s + "/" : ""); }
+  function safeName(t) { return t.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[*_`]/g, "").replace(/[\\\/:*?"<>|#%]/g, "").replace(/\s+/g, " ").trim().replace(/[. ]+$/, ""); }
+
+  /* ---------- the wanted list ---------- */
+  function loadWanted() {
+    return fetch(ROOT + "raw/background/wanted-articles.md", { cache: "no-cache" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (md) {
+      var sel = $("wanted-list"), group = null, count = 0;
+      md.split("\n").forEach(function (line) {
+        var h = line.match(/^###\s+(.+)$/);
+        if (h) { group = document.createElement("optgroup"); group.label = h[1]; sel.appendChild(group); return; }
+        var m = line.match(/^- \[ \] \*\*([A-Z]\d+)\. (.+?):\*\* (.+)$/);
+        if (!m) return;
+        wanted[m[1]] = { id: m[1], name: m[2], desc: m[3].trim() };
+        var o = document.createElement("option");
+        o.value = m[1]; o.textContent = m[1] + ". " + m[2];
+        (group || sel).appendChild(o); count++;
+      });
+      $("wanted").hidden = !count;
+      var mine = picked();
+      if (mine) sel.value = mine.id;
+    }).catch(function () {});
+  }
+  function picked() {
+    var w = null; try { w = JSON.parse(get(WANTED_KEY) || "null"); } catch (e) {}
+    if (!w || !w.desc) return null;
+    // only while the topic box still holds that topic
+    return H.topic().replace(/\s+/g, " ").trim() === w.desc ? w : null;
+  }
+  function choose(id) {
+    var w = wanted[id];
+    if (!w) return;
+    if (H.topic().replace(/\s+/g, " ").trim() === w.desc) { set(WANTED_KEY, JSON.stringify(w)); return; }
+    if (H.hasProgress() && !confirm("Start a new article on “" + w.name + "”? Your progress on the current one will be cleared.")) {
+      var mine = picked(); $("wanted-list").value = mine ? mine.id : ""; return;
+    }
+    H.startTopic(w.desc);
+    set(WANTED_KEY, JSON.stringify(w));
+    $("wanted-list").value = id;
+    syncTitle();
+  }
+  $("wanted-list").addEventListener("change", function () { if (this.value) choose(this.value); });
+
+  /* ---------- where things go ---------- */
+  function fillUnder() {
+    var sel = $("add-under"), keep = sel.value;
+    sel.innerHTML = "";
+    var top = document.createElement("option"); top.value = ""; top.textContent = "Top level"; sel.appendChild(top);
+    pages.map(function (p) { return p.f; }).filter(function (f) { return f !== "Home"; }).sort(function (a, b) { return a.localeCompare(b); })
+      .forEach(function (f) { var o = document.createElement("option"); o.value = f; o.textContent = f; sel.appendChild(o); });
+    sel.value = keep || (pages.some(function (p) { return p.f === "Background"; }) ? "Background" : "");
+  }
+
+  /* ---------- the form ---------- */
+  function src() { var r = document.querySelector('input[name="add-src"]:checked'); return r ? r.value : "article"; }
+  function syncTitle() {
+    var c = H.current();
+    if (src() === "article" && c && !$("add-title").dataset.edited) $("add-title").value = safeName(c.title || "");
+  }
+  function syncForm() {
+    var files = src() === "files";
+    $("add-files-row").hidden = !files;
+    $("add-title-row").hidden = files;
+    $("add-token-row").hidden = !!get(TOKEN_KEY);
+    $("add-forget").hidden = !get(TOKEN_KEY);
+    syncTitle();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="add-src"]'), function (r) { r.addEventListener("change", syncForm); });
+  $("add-title").addEventListener("input", function () { this.dataset.edited = this.value ? "1" : ""; });
+  document.addEventListener("wiki:article", function () { $("add-title").dataset.edited = ""; syncTitle(); });
+  $("add-forget").addEventListener("click", function () { set(TOKEN_KEY, null); $("add-token").value = ""; syncForm(); status("The token is gone from this browser."); });
+
+  function status(msg, bad, html) {
+    var el = $("add-status");
+    el.className = "hint" + (bad ? " bad" : "");
+    if (html) el.innerHTML = msg; else el.textContent = msg;
+  }
+
+  /* ---------- GitHub ---------- */
+  function b64text(t) { return btoa(unescape(encodeURIComponent(t))); }
+  function unb64text(b) { return decodeURIComponent(escape(atob(b.replace(/\s/g, "")))); }
+  function b64file(file) {
+    return new Promise(function (ok, fail) {
+      var r = new FileReader();
+      r.onload = function () { ok(String(r.result).split(",")[1] || ""); };
+      r.onerror = function () { fail(new Error("Couldn’t read " + file.name)); };
+      r.readAsDataURL(file);
+    });
+  }
+  function readText(file) {
+    return new Promise(function (ok, fail) { var r = new FileReader(); r.onload = function () { ok(String(r.result)); }; r.onerror = fail; r.readAsText(file); });
+  }
+  function api(method, path, body) {
+    var url = "https://api.github.com/repos/" + cfg.repo + "/contents/" + path.split("/").map(encodeURIComponent).join("/");
+    if (method === "GET") url += "?ref=" + encodeURIComponent(cfg.branch);
+    return fetch(url, {
+      method: method,
+      headers: { "Authorization": "Bearer " + get(TOKEN_KEY), "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+      body: body ? JSON.stringify(body) : undefined, cache: "no-store"
+    }).then(function (r) {
+      if (r.status === 404 && method === "GET") return null;
+      if (r.status === 401) throw new Error("GitHub didn’t accept the token. Forget it and paste a new one.");
+      if (r.status === 403) throw new Error("The token can’t write to the wiki. It needs Contents: Read and write on " + cfg.repo + ".");
+      if (r.status === 409 || r.status === 422) throw new Error("GitHub refused the change (" + r.status + "). Try again in a moment.");
+      if (!r.ok) throw new Error("GitHub answered " + r.status + ".");
+      return r.json();
+    });
+  }
+  function putFile(path, b64, message) {
+    return api("GET", path).then(function (old) {
+      if (old && !confirm("“" + path + "” is already in the wiki. Replace it?")) return "skipped";
+      var body = { message: message, content: b64, branch: cfg.branch };
+      if (old) body.sha = old.sha;
+      return api("PUT", path, body).then(function () { return old ? "replaced" : "added"; });
+    });
+  }
+  function tickWanted(w, title) {
+    var path = "Background/Wanted articles.md";
+    return api("GET", path).then(function (f) {
+      if (!f) return;
+      var text = unb64text(f.content);
+      var re = new RegExp("^- \\[ \\] (\\*\\*" + w.id + "\\..*)$", "m");
+      if (!re.test(text)) return;
+      text = text.replace(re, function (_, rest) { return "- [x] " + rest + " See [[" + title + "|Background/" + title + "]]."; });
+      return api("PUT", path, { message: "Tick " + w.id + " on the wanted list", content: b64text(text), branch: cfg.branch, sha: f.sha });
+    });
+  }
+
+  /* ---------- adding ---------- */
+  function jobs() {
+    var under = $("add-under").value;
+    var prefix = under ? under + "/" : "";
+    if (src() === "article") {
+      var c = H.current();
+      if (!c) return Promise.reject(new Error("Paste the final article in Save for Discord first."));
+      var title = safeName($("add-title").value);
+      if (!title) return Promise.reject(new Error("Give the page a title."));
+      return Promise.resolve([{ path: prefix + title + ".md", title: title, page: prefix + title, b64: b64text(c.text), wanted: under === "Background" ? picked() : null }]);
+    }
+    var files = Array.prototype.slice.call($("add-files").files || []);
+    if (!files.length) return Promise.reject(new Error("Choose one or more files."));
+    return Promise.all(files.map(function (file) {
+      if (/\.(md|markdown)$/i.test(file.name)) {
+        return readText(file).then(function (t) {
+          var m = t.match(/^#\s+(.+?)\s*#*\s*$/m);
+          var title = safeName(m ? m[1] : file.name.replace(/\.(md|markdown)$/i, ""));
+          return { path: prefix + title + ".md", title: title, page: prefix + title, b64: b64text(t) };
+        });
+      }
+      if (!under) return Promise.reject(new Error("“" + file.name + "” isn’t a page, so it needs a page to belong to. Choose one under “Put it under”."));
+      return b64file(file).then(function (b) { return { path: prefix + file.name, attach: file.name, page: under, b64: b }; });
+    }));
+  }
+
+  $("add-go").addEventListener("click", function () {
+    var btn = this;
+    if (!cfg) { status("The wiki’s settings haven’t loaded. Check the connection and reload.", true); return; }
+    var tok = $("add-token").value.trim();
+    if (tok) { set(TOKEN_KEY, tok); $("add-token").value = ""; }
+    if (!get(TOKEN_KEY)) { syncForm(); status("Paste a GitHub token first.", true); $("add-token").focus(); return; }
+    btn.disabled = true;
+    var done = [];
+    jobs().then(function (list) {
+      var chain = Promise.resolve();
+      list.forEach(function (j, i) {
+        chain = chain.then(function () {
+          status("Adding " + (i + 1) + " of " + list.length + ": " + j.path + "…");
+          var msg = (j.attach ? "Attach " + j.attach + " to " + j.page : "Add " + j.page) + " (from the DeepSeek helper)";
+          return putFile(j.path, j.b64, msg).then(function (how) {
+            if (how === "skipped") return;
+            done.push({ j: j, how: how });
+            if (j.wanted) return tickWanted(j.wanted, j.title).then(function () { set(WANTED_KEY, null); });
+          });
+        });
+      });
+      return chain;
+    }).then(function () {
+      syncForm();
+      if (!done.length) { status("Nothing was added."); return; }
+      var links = done.map(function (d) {
+        var url = d.j.attach ? pageUrl(d.j.page) + d.j.attach : pageUrl(d.j.page);
+        return '<a href="' + url + '">' + (d.j.attach || d.j.title).replace(/[&<>]/g, "") + "</a> (" + d.how + ")";
+      });
+      status("Done: " + links.join(", ") + ". The website updates in a few minutes; the Listen audio comes with it.", false, true);
+      if (done.some(function (d) { return d.j.wanted; })) loadWantedAgain();
+    }).catch(function (e) {
+      status((e && e.message) || "Something went wrong.", true);
+      syncForm();
+    }).then(function () { btn.disabled = false; });
+  });
+  function loadWantedAgain() {
+    var sel = $("wanted-list"); sel.innerHTML = '<option value="">Wanted articles</option>'; wanted = {};
+    loadWanted();
+  }
+
+  /* ---------- start ---------- */
+  fetch(ROOT + "wiki.json").then(function (r) { return r.json(); }).then(function (c) { cfg = c; }).catch(function () {});
+  fetch(ROOT + "search.json").then(function (r) { return r.json(); }).then(function (d) { pages = d.filter(function (p) { return p.f; }); fillUnder(); }).catch(function () {});
+  fillUnder();
+  syncForm();
+  loadWanted().then(function () {
+    var id = new URLSearchParams(location.search).get("id");
+    if (id && wanted[id]) {
+      choose(id);
+      try { history.replaceState(null, "", location.pathname); } catch (e) {}
+    }
+  });
+})();
+</script>
 </body>
 </html>

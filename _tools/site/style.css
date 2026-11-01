@@ -20,6 +20,7 @@ a.missing { color: var(--missing); }
 .top { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
   max-width: 50rem; margin: 0 auto; padding: 14px 16px 6px; }
 .top .home { font: 600 1.15rem/1.2 var(--display); color: var(--ink); }
+.top .newart { font-size: .9rem; margin-right: auto; margin-left: 4px; }
 .search { position: relative; flex: 1 1 12rem; max-width: 20rem; margin: 0; }
 .search input { width: 100%; font: inherit; font-size: 1rem; padding: 7px 12px; border-radius: 999px;
   border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
@@ -86,3 +87,8 @@ summary { cursor: pointer; font-weight: 600; }
 .children ul { padding-left: 1.1em; } .children li { margin: .35em 0; }
 .children .dim { display: block; line-height: 1.45; }
 .pagefoot { font-size: .85rem; color: var(--muted); margin: 14px 4px; }
+
+sup.cite { font-size: .72em; line-height: 0; white-space: nowrap; }
+sup.cite a { padding: 0 1px; }
+li:target { background: var(--mark); border-radius: 4px; transition: background-color 1.5s; }
+a.write { font-size: .85rem; white-space: nowrap; }

@@ -128,7 +128,72 @@ def render(page, site):
                 el["class"] = el.get("class", []) + ["missing"]
                 el["title"] = "This page has not been written yet"
                 el[attr] = page_url(slugify_path(path)) if path else page_url("")
+    link_citations(soup)
+    if page.path == "Background/Wanted articles":
+        add_write_links(soup)
     return str(soup), needs
+
+
+CITE_RE = re.compile(r"\[(\d{1,3})\]")
+
+
+def link_citations(soup):
+    """DeepSeek-style [1] citations: link each to its entry in the References list."""
+    head = next((h for h in soup.find_all("h2")
+                 if h.get_text(" ", strip=True).rstrip("#").strip().lower() == "references"), None)
+    refs = head.find_next_sibling(["ol", "ul"]) if head is not None else None
+    if refs is None:
+        return
+    start = int(refs.get("start", 1)) if str(refs.get("start", "1")).isdigit() else 1
+    notes = {}
+    for i, li in enumerate(refs.find_all("li", recursive=False)):
+        n = start + i
+        li["id"] = f"ref-{n}"
+        notes[n] = re.sub(r"\s+", " ", li.get_text("")).strip()
+    for node in list(soup.find_all(string=CITE_RE)):
+        if node.find_parent(["pre", "code", "a", "h1", "h2", "h3", "h4", "h5", "h6", "script"]) is not None:
+            continue
+        if node.find_parent(id=refs.get("id")) is not None and refs.get("id"):
+            continue
+        if any(p is refs for p in node.parents):
+            continue
+        text, pos, parts = str(node), 0, []
+        for m in CITE_RE.finditer(text):
+            n = int(m.group(1))
+            if n not in notes:
+                continue
+            parts.append(text[pos:m.start()])
+            sup = soup.new_tag("sup", attrs={"class": "cite"})
+            a = soup.new_tag("a", href=f"#ref-{n}", title=notes[n][:300])
+            a.string = f"[{n}]"
+            sup.append(a)
+            parts.append(sup)
+            pos = m.end()
+        if not parts:
+            continue
+        parts.append(text[pos:])
+        for part in parts:
+            node.insert_before(part if not isinstance(part, str) else soup.new_string(part))
+        node.extract()
+    for li in refs.find_all("li", recursive=False):
+        for a in li.find_all("a", href=True):
+            if a["href"].startswith(("http://", "https://")):
+                a["target"] = "_blank"
+
+
+def add_write_links(soup):
+    """On the wanted list, a link from each unwritten topic to the DeepSeek helper."""
+    for li in soup.select("li.task-list-item"):
+        box = li.find("input")
+        if box is None or box.has_attr("checked"):
+            continue
+        m = re.match(r"\s*([DB]\d+)\.", li.get_text(" ", strip=True))
+        if not m:
+            continue
+        a = soup.new_tag("a", href=f"{CONFIG['base_path']}tools/deepseek/?id={m.group(1)}", attrs={"class": "write"})
+        a.string = "Write it"
+        li.append(" ")
+        li.append(a)
 
 
 def fmt_date(ts):
@@ -204,7 +269,7 @@ def layout(title, body, *, desc="", needs=None, canonical="", extra_head=""):
 <link rel="stylesheet" href="{b}style.css?v={ASSET_V}">
 <script defer src="{b}app.js?v={ASSET_V}"></script>{head}
 </head><body>
-<header class="top"><a class="home" href="{b}">{name}</a>
+<header class="top"><a class="home" href="{b}">{name}</a><a class="newart" href="{b}tools/deepseek/">Write an article</a>
 <form class="search" role="search" action="{b}search/"><input type="search" name="q" placeholder="Search" aria-label="Search the wiki" autocomplete="off"><div class="results" hidden></div></form>
 </header>
 <main>{body}</main>
@@ -303,10 +368,11 @@ def main():
         copy_attachments(page, out)
         heads = [h.get_text(" ", strip=True).rstrip("#").strip()
                  for h in BeautifulSoup(content, "html.parser").select("h2, h3")]
-        index.append({"t": page.title, "u": page_url(page.slug), "s": page.summary,
+        index.append({"t": page.title, "f": page.path, "u": page_url(page.slug), "s": page.summary,
                       "h": [h for h in heads if h and h != "References"], "p": page.path.rsplit("/", 1)[0] if "/" in page.path else ""})
         llms.append(f"- [{page.title}]({CONFIG['site_url']}raw/{page.slug or 'home'}.md): {page.summary}")
 
+    write(out / "wiki.json", json.dumps({k: CONFIG[k] for k in ("site_name", "site_url", "base_path", "repo", "branch")}))
     write(out / "search.json", json.dumps(index, ensure_ascii=False, separators=(",", ":")))
     write(out / "llms.txt", f"# {CONFIG['site_name']}\n\n"
           f"> Mikey's wiki about his sound and game projects and the subjects behind them. "
