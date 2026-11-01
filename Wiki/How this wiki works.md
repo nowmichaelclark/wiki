@@ -50,4 +50,15 @@ The rules Claude follows are in `CLAUDE.md` in the repo and in [[Writing guide|W
 
 ## The DeepSeek tool
 
-The website includes the step-by-step helper for writing background articles with DeepSeek, at `tools/deepseek/`. It walks through the five prompts and turns the final reply into a `.md` file. The rules it gives DeepSeek are [[DeepSeek article guide|Wiki/DeepSeek article guide]], and the download there is always the current version of that page.
+The website includes the step-by-step helper for writing background articles with DeepSeek, at `tools/deepseek/`; every page's header links to it as Write an article. It walks through the five prompts and turns the final reply into a `.md` file. The rules it gives DeepSeek are [[DeepSeek article guide|Wiki/DeepSeek article guide]], and the download there is always the current version of that page.
+
+The helper is tied to the wiki in both directions:
+
+- **Picking a topic.** Its topic box can be filled from [[Wanted articles|Background/Wanted articles]], and each unwritten line on that page has a Write it link that opens the helper with that topic.
+- **Adding to the wiki.** Its Add to the wiki section commits the finished article straight into the repo, and if the topic came from the wanted list, ticks it there. The same section can add any Markdown file as a page, or any other file, such as an image or a recording, as an attachment of a chosen page.
+
+Adding needs a GitHub token, pasted once on each device and kept only in that browser. It is the same kind of token the [[Otterwiki editor|Wiki/Otterwiki editor]] uses: access to the wiki repo only, with Contents set to Read and write. Anyone using that browser can add to the wiki, so use Forget the token on a shared device.
+
+## Citations
+
+On the website, each numbered citation such as [1] in a background article links to its entry in the References list, and hovering over it shows the reference. The links in the References list open the sources in a new tab. Otterwiki and the Discord export show citations as plain numbers.
