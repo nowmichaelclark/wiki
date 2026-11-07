@@ -831,7 +831,7 @@ footer { color: var(--muted); font-size: 0.875rem; text-align: center; }
     return fetch(ROOT + "raw/background/wanted-articles.md", { cache: "no-cache" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (md) {
       var sel = $("wanted-list"), group = null, count = 0;
       md.split("\n").forEach(function (line) {
-        var h = line.match(/^###\s+(.+)$/);
+        var h = line.match(/^##\s+(.+)$/);
         if (h) { group = document.createElement("optgroup"); group.label = h[1]; sel.appendChild(group); return; }
         var m = line.match(/^- \[ \] \*\*([A-Z]\d+)\. (.+?):\*\* (.+)$/);
         if (!m) return;

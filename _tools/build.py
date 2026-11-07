@@ -187,7 +187,7 @@ def add_write_links(soup):
         box = li.find("input")
         if box is None or box.has_attr("checked"):
             continue
-        m = re.match(r"\s*([DB]\d+)\.", li.get_text(" ", strip=True))
+        m = re.match(r"\s*([A-Z]\d+)\.", li.get_text(" ", strip=True))
         if not m:
             continue
         a = soup.new_tag("a", href=f"{CONFIG['base_path']}tools/deepseek/?id={m.group(1)}", attrs={"class": "write"})
