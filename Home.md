@@ -5,7 +5,7 @@ This wiki covers the sound, game and toy software Mikey makes with Claude: what 
 ## Projects
 
 - [[Driftloom]]: a procedural loop machine that generates and synthesizes relaxing loops in the browser.
-- [[Broken Friends]]: a 2D, mobile-first creature-care game made of many small physics mini-games.
+- [[Broken Friends]]: a 3D game for PC about a small teddy bear that explores a procedural, smoggy world.
 
 ## Background
 
