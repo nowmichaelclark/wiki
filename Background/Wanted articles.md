@@ -47,7 +47,6 @@ Claude's knowledge stops at a fixed date, and these subjects keep moving. Withou
 - [ ] **B4. Frame pacing and hitches on PC:** Smooth frames on PC: frame pacing and why a steady 60 fps feels better than an average of 60 with spikes, V-Sync and variable refresh rate, measuring hitches (1% lows, frame-time graphs), stutter from loading or generating on the main thread, and thermal and battery throttling on laptops.
 - [ ] **B3. Profiling Godot on a laptop GPU:** Finding where frame time goes in a Godot 4 3D game: the built-in profiler and monitors, the --gpu-profile command-line option, RenderDoc, Intel Graphics Performance Analyzers and Vulkan timestamp queries, choosing the GPU on a laptop that has two, and how to tell whether a frame is CPU-bound or GPU-bound.
 - [ ] **D8. Android audio:** Audio on Android: output latency, the AAudio API and Google's Oboe library, low-latency versus power-saving modes, audio in Chrome on Android compared to native apps, playing audio with the screen off, and differences between budget and flagship phones.
-- [ ] **B9. Shipping on Android:** Android app lifecycle and distribution for a small open-source game: pausing, resuming and the system killing the app, saving safely when that happens, 32-bit and 64-bit ARM libraries, the 16 KB memory page size requirement for native libraries, and Google Play compared to F-Droid (including reproducible builds).
 
 ## Low-level performance
 
@@ -70,8 +69,6 @@ Claude's knowledge stops at a fixed date, and these subjects keep moving. Withou
 
 - [ ] **B1. Godot's Mobile renderer and draw calls:** How Godot 4's Mobile renderer draws a 3D scene: which passes it has and which it leaves out compared to Forward+, its light limits per mesh, draw calls and what multiplies them (materials, shadow cascades, transparent objects), MultiMesh, visibility ranges, and how to measure and lower the draw call count.
 - [ ] **B6. Godot's servers from Rust:** Using Godot's low-level servers (RenderingServer, PhysicsServer3D) directly from Rust through godot-rust, instead of nodes, to draw and simulate thousands of props cheaply; what MultiMesh already gives; and when the extra complexity pays off.
-- [ ] **B7. Shrinking Godot builds:** Making Godot exports smaller and faster to load: custom export templates with unused engine modules switched off, build optimization flags, APK and AAB size, WebAssembly size for web builds, and startup time on slow phones.
-- [ ] **B8. Godot on the web on phones:** Running Godot 4 web exports in mobile browsers: WebGL 2 limits, single-threaded exports compared to threaded ones (SharedArrayBuffer and the cross-origin isolation headers that GitHub Pages can't set), mobile browser memory limits, download size, startup time, and installing as a PWA.
 - [ ] **D10. Godot audio:** The Godot 4 audio system: AudioServer, buses and effects, AudioStreamPlayer, AudioStreamGenerator for procedurally generated sound, mix rate and buffer settings, and audio issues when exporting to Android and the web.
 
 ## Rust and WebAssembly
@@ -80,7 +77,6 @@ Claude's knowledge stops at a fixed date, and these subjects keep moving. Withou
 - [ ] **D11. Rust inside Godot:** GDExtension and the godot-rust (gdext) project: how a Rust library plugs into Godot 4, threading and audio, building for Android and the web, and the pitfalls people commonly hit.
 - [ ] **B10. godot-rust in depth:** The godot-rust (gdext) library for Godot 4: defining classes in Rust, exported properties, the Gd<T> smart pointer and who owns what across the boundary, the cost of each call into the engine and how to batch calls, worker threads that hand finished data to the main thread, what happens when Rust panics, and hot reloading.
 - [ ] **B11. Building a Rust GDExtension in CI:** Building one Rust GDExtension for Linux and Windows in GitHub Actions and exporting the Godot game in the same workflow: toolchains and targets, pinning the Rust and Godot versions, release profiles and panic settings, caching cargo builds, and what Android or web builds would add later.
-- [ ] **B15. Rust audio libraries:** Rust audio libraries for games (cpal, kira, fundsp, rodio, oddio), how they structure a mixer, and lock-free queues (such as rtrb or ringbuf) for sending commands to the audio thread without blocking it.
 
 ## Engine architecture and tools
 
@@ -111,8 +107,6 @@ Claude's knowledge stops at a fixed date, and these subjects keep moving. Withou
 - [x] **D2. Web Audio and AudioWorklet:** The Web Audio API and AudioWorklet: the 128-frame render quantum, how the main thread and the audio thread talk to each other, running WebAssembly inside a worklet, browser autoplay rules, and known quirks of Chrome on Android. See [[Background/Web Audio API]].
 - [x] **D4. Scheduling notes in time:** How music software schedules notes with sample accuracy, including the lookahead scheduler pattern from Chris Wilson's "A Tale of Two Clocks," the audio clock compared to JavaScript timers, and why timing jitters when the main thread is busy. See [[Background/Sample-accurate scheduling]].
 - [x] **D5. Voice budgets:** Voice allocation and polyphony limits in synthesizers and game audio engines: voice-stealing strategies (oldest, quietest, lowest priority), per-voice CPU budgets, and how game studios and middleware like Wwise and FMOD keep voice counts under control. See [[Background/Voice budget]].
-- [ ] **B16. Mixing music and sound effects together:** Game audio mixer design: buses, ducking music under important sounds, priorities, voice limits shared by music and sound effects, and the trade-offs of one shared mixer compared to separate music and effects systems.
-- [ ] **B19. Baked or live sound:** Pre-rendering sounds at load time compared to synthesizing them live: memory compared to CPU cost, caching, memory budgets on low-RAM phones, sample rate choices (22.05 kHz compared to 44.1 or 48 kHz), and the cost of resampling.
 - [ ] **D36. Audio middleware concepts:** Core concepts of game audio middleware like Wwise and FMOD: events, parameters (RTPCs), states and switches, buses, containers and property inheritance, explained for someone who has never used either.
 - [ ] **D37. Data-driven game audio:** Data-driven and node-based game audio design: Valve's Source 2 sound system (sound events, soundstacks, operators and mix graphs) as described in Valve's talk on its audio engine, plus Max/MSP and Pure Data, and the split between control-rate and audio-rate processing.
 - [ ] **D42. Phone speakers:** Mixing for phone speakers: the limited frequency range of small speakers, the missing fundamental (hearing bass notes that aren't really there), mono compatibility, and techniques developers use so audio sounds good on phones.
@@ -130,7 +124,6 @@ Claude's knowledge stops at a fixed date, and these subjects keep moving. Withou
 - [ ] **D21. Dynamics:** Dynamics processing in music: compressors, limiters, soft clipping and sidechain compression (the "pumping" or "breathing" against a kick drum), and how a master bus chain keeps a mix from clipping.
 - [ ] **D22. Procedural sound effects:** Procedural audio for sound effects: synthesizing footsteps, water, wind, fabric tearing and squishy objects from code instead of recordings, including Andy Farnell's book "Designing Sound," random pitch and volume variation to avoid repetition, and games that used procedural effects.
 - [ ] **B17. Sounds from physics:** Contact sounds driven by a 3D physics engine such as Jolt: mapping impact strength to volume, pitch and sound choice, material pairs (plush on rock, wet fur on mud), rolling and sliding loops, and throttling the flood of tiny contacts that ragdolls produce.
-- [ ] **B18. Thousands of unique voices:** Making thousands of procedurally generated character voices sound distinct: which voice parameters people notice (pitch, formants, speed, timbre), just-noticeable differences, and how to space choices so 10,000 voices don't blur together.
 - [ ] **D40. Gibberish voices:** Gibberish character voices in games: Animal Crossing's Animalese, Banjo-Kazooie's mumbling, Simlish and Undertale's text blips, and how procedural babble gives characters personality without real words.
 
 ## Music theory
@@ -236,5 +229,4 @@ Claude's knowledge stops at a fixed date, and these subjects keep moving. Withou
 - [ ] **G26. 8-bit and 16-bit tricks:** How NES, Game Boy and SNES games did more with less: sprite multiplexing, palette swaps, metatiles, raster effects and scrolling tricks, and which ideas still help today.
 - [ ] **G28. The demoscene and size-coding:** 4K and 64K intros, procedural content in .kkrieger and Farbrausch's tools, executable compression, and fitting a lot of content into a few bytes.
 - [ ] **G29. Classic engine source code:** What developers learn from reading the Doom, Quake and Build engine source code, Fabien Sanglard's Game Engine Black Book series, and which lessons still apply.
-- [ ] **B52. Virtual pet design:** The design of virtual pet games: Tamagotchi, Nintendogs, Sonic Adventure's Chao Garden, Monster Rancher, Neopets and Pou; care loops, time passing while the game is closed, attachment and loss.
 - [ ] **B53. Cute and gross:** Why some characters read as cute (Konrad Lorenz's "baby schema"), why plush toys are appealing, and how games, toys and cartoons mix cute with gross-out humor without becoming disturbing.
