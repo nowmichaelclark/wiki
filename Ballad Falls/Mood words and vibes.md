@@ -1,6 +1,6 @@
 # Mood words and vibes
 
-**Mood words** are Mikey's vocabulary for describing loops, and **vibes** are the ones the app offers: a listener picks vibes, and every new loop leans toward them. At 1.0 there are 88 vibes, each a small recipe in the plain-text file `data/vibes.txt`. The mood words and their history are in the repo's `docs/MOODS.md`, and the recipes and how to edit them in `docs/VIBES.md`.
+**Mood words** are Mikey's vocabulary for describing loops, and **vibes** are the ones the app offers: a listener picks vibes, and every new loop leans toward them. At 1.0 there are 88 vibes, each a small recipe in the plain-text file `data/vibes.txt`. The mood words are in the repo's `docs/MOODS.md`, and the recipes and how to edit them in `docs/VIBES.md`. How the words were sorted, ranked and turned into vibes is on the subpage [[How the words were tested|Ballad Falls/Mood words and vibes/How the words were tested]], and how the recipes were drafted and measured is on [[How the vibes were tuned|Ballad Falls/Mood words and vibes/How the vibes were tuned]].
 
 ## The spirit of the words
 

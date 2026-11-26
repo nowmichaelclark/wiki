@@ -1,6 +1,6 @@
 # Long pieces
 
-**Long pieces** are Ballad Falls loops that last more than 32 bars: from about a minute up to 32,768 bars (about 27 hours at 80 beats a minute), or Endless. A short loop repeats as written. A long piece is composed: it has sections, a journey, a theme that returns, and joins that are written rather than left to chance. They were built as queue item 102 in November 2026, from the design in the repo's `docs/LONGFORM.md`, and shown on screen by item 106.
+**Long pieces** are Ballad Falls loops that last more than 32 bars: from about a minute up to 32,768 bars (about 27 hours at 80 beats a minute), or Endless. A short loop repeats as written. A long piece is composed: it has sections, a journey, a theme that returns, and joins that are written rather than left to chance. They were built as queue item 102 in November 2026, from the design in the repo's `docs/LONGFORM.md`, and shown on screen by item 106. How the design changed while it was built, and a set of pieces to hear, are on the subpage [[How long pieces were built|Ballad Falls/Long pieces/How long pieces were built]].
 
 ## A plan without memory
 
