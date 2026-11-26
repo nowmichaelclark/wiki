@@ -30,7 +30,7 @@
 
 ## How the work was done
 
-The project was built by Claude sessions in roles, with Mikey deciding and listening. A **brain** chat in a claude.ai Project planned the work and wrote the queue. **Hands** sessions in Claude Code wrote the code, measured it and merged their own pull requests when CI was green. **Ears** sessions measured records against renders, and **Painter** sessions designed the screens. From 10 November, the road to 1.0 ran as a numbered list of session prompts, often two chains at a time, each prompt naming its model, its effort and what had to merge before it started.
+The project was built by Claude sessions in roles, with Mikey deciding and listening. A **brain** chat in a claude.ai Project planned the work and wrote the queue. **Hands** sessions in Claude Code wrote the code, measured it and merged their own pull requests when CI was green. **Ears** sessions measured records against renders, and **Painter** sessions designed the screens ([[The design spec|Ballad Falls/History/The design spec]]). From 10 November, the road to 1.0 ran as a numbered list of session prompts, often two chains at a time, each prompt naming its model, its effort and what had to merge before it started.
 
 Mikey's ears were the acceptance test throughout. The brain built listening albums from the Done list, blind A/B albums for changes to sounds he already liked and labeled albums for new sounds, and his answers became decisions ([[Why it was decided|Ballad Falls/Why it was decided]]).
 
