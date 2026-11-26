@@ -1,6 +1,6 @@
 # For Claude sessions
 
-This repo is Mikey's Workshop Wiki: Markdown pages about his sound and game projects (Driftloom, Broken Friends) and the background subjects behind them. It is published to <https://nowmichaelclark.github.io/wiki/> and edited in Otterwiki, so the files must stay in Otterwiki's layout.
+This repo is Mikey's Workshop Wiki: Markdown pages about his sound and game projects (Ballad Falls, once Driftloom, and Broken Friends) and the background subjects behind them. It is published to <https://nowmichaelclark.github.io/wiki/> and edited in Otterwiki, so the files must stay in Otterwiki's layout.
 
 ## Read first
 

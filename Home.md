@@ -4,7 +4,7 @@ This wiki covers the sound, game and toy software Mikey makes with Claude: what 
 
 ## Projects
 
-- [[Driftloom]]: a procedural loop machine that generates and synthesizes relaxing loops in the browser.
+- [[Ballad Falls]]: a procedural loop machine that generates and synthesizes relaxing loops in the browser and on Android (called Driftloom until its 1.0 release in November 2026).
 - [[Broken Friends]]: a 3D game for PC about a small teddy bear that explores a procedural, smoggy world.
 
 ## Background

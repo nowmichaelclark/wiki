@@ -43,7 +43,7 @@ Download for Discord saves the article as a `.md` file that Discord's Markdown v
 Some things to ask a Claude Code session with this repo:
 
 - "Write a wiki article about what you just changed in pull request 312."
-- "Read the Driftloom pages and tell me what the wiki is missing."
+- "Read the Ballad Falls pages and tell me what the wiki is missing."
 - "Check the Background articles against what Broken Friends needs next."
 
 The rules Claude follows are in `CLAUDE.md` in the repo and in [[Writing guide|Wiki/Writing guide]].
