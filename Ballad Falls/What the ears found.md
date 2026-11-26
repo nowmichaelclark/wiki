@@ -1,6 +1,6 @@
 # What the ears found
 
-**The ears** are Claude sessions that listen by measuring. An ears session takes records Mikey loves and loops Ballad Falls renders, measures both the same way, and reports where they differ, each difference with a yardstick that a code session can test against. Mikey still decides whether anything sounds good. Between October and November 2026 the ears measured 32 of his albums against the app, then hundreds of album cards, and their findings shaped most of the sound changes before 1.0.
+**The ears** are Claude sessions that listen by measuring. An ears session takes records Mikey loves and loops Ballad Falls renders, measures both the same way, and reports where they differ, each difference with a yardstick that a code session can test against. Mikey still decides whether anything sounds good. Between October and November 2026 the ears measured 32 of his albums against the app, then wrote 41 album cards, and their findings shaped most of the sound changes before 1.0. On 26 November 2026 Mikey folded the ears into Research sessions, which run the same tools and write their findings here.
 
 ## Who does what
 
@@ -26,7 +26,7 @@ The first two batches measured 32 albums (20, then 12) against the app at commit
 
 Note density, repetition, pitch wobble and beat clarity were already in range. A tuning difference reported in the first batch was corrected in the second: only 8 of the 32 albums are clearly off A440, so it stayed optional.
 
-The source table is in the repo's `docs/EARS.md`, "What 32 albums say".
+The source table was the repo's `docs/EARS.md`, "What 32 albums say", readable at commit `72b13f0` and in the archived driftloom repository. How the stereo gap was closed is on [[Stereo, measured|Ballad Falls/What the ears found/Stereo, measured]].
 
 ## What came of it
 
@@ -37,7 +37,7 @@ The findings became items, and the items changed the app:
 - **The chapel organ** (16 October 2026): one organ a loop, mixed from four registrations, holding through passing chords and sitting outside the voice budget, because reserving room for it inside the budget refused other parts' notes.
 - **Long chords**: chord changes a minute fell from 22.5 to 19.4 in the measured corpus, and one-chord loops rose from 11 to 31 of 400.
 
-Two later batches synthesized the **album cards**, a short measured summary of each record. The second synthesis became **batch 6** (November 2026), built in the core in sessions 02 to 10: the far ends of the range, pitch, width, the kit, color, planing chords, a low bell and a soft twang. A slow wow on the chords alone (`padWow`, #369) and major sevenths sliding a step (`planingSevenths`, #397) are two of its sounds.
+Two later batches synthesized the **album cards**, a short measured summary of each record ([[Measuring a record|Ballad Falls/What the ears found/Measuring a record]] tells how a card is made). Each round of sketches is on [[The sketch rounds|Ballad Falls/What the ears found/The sketch rounds]]. The second synthesis became **batch 6** (November 2026), built in the core in sessions 02 to 10: the far ends of the range, pitch, width, the kit, color, planing chords, a low bell and a soft twang. A slow wow on the chords alone (`padWow`, #369) and major sevenths sliding a step (`planingSevenths`, #397) are two of its sounds.
 
 ## Lessons the ears kept
 
